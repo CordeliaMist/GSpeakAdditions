@@ -20,7 +20,7 @@ public class ImEtheirys
 
     public static bool ButtonSelectorStrip(string id, Vector2 size, ref int selected, string[] options)
     {
-        if (size == Vector2.Zero) size = new Vector2(GetRemainingWidth(), GetLineHeight());
+        if(size == Vector2.Zero) size = new Vector2(GetRemainingWidth(), GetLineHeight());
 
         bool changed = false;
         float buttonWidth = size.X / options.Length;
@@ -30,19 +30,19 @@ public class ImEtheirys
             using (ImRaii.PushStyle(ImGuiStyleVar.ChildRounding, ImGui.GetStyle().FrameRounding))
             {
                 using var child = ImRaii.Child(id, size, false, ImGuiWindowFlags.NoScrollbar);
-                if (child.Success)
+                if(child.Success)
                 {
                     using (ImRaii.PushStyle(ImGuiStyleVar.ItemSpacing, new Vector2(0, 0)))
                     {
-                        for (int i = 0; i < options.Length; i++)
+                        for(int i = 0; i < options.Length; i++)
                         {
-                            if (i > 0)
+                            if(i > 0)
                                 ImGui.SameLine();
 
                             bool val = i == selected;
                             ToggleStripButton($"{options[i]}##{id}", new(buttonWidth, size.Y), ref val, false);
 
-                            if (val && i != selected)
+                            if(val && i != selected)
                             {
                                 selected = i;
                                 changed = true;
@@ -64,7 +64,7 @@ public class ImEtheirys
         {
             using (ImRaii.PushColor(ImGuiCol.Button, ImGui.GetColorU32(selected ? ImGuiCol.TabActive : ImGuiCol.Tab)))
             using (ImRaii.PushStyle(ImGuiStyleVar.ItemSpacing, new Vector2(0, 0)))
-                if (ImGui.Button(label, size))
+                if(ImGui.Button(label, size))
                 {
                     selected = !selected;
                     clicked = true;

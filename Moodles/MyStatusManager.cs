@@ -35,32 +35,32 @@ public class MyStatusManager
     // Only controlled by the CommonProcessor and can bypass lock checks.
     public void Remove(MyStatus status, bool triggerEvent = true)
     {
-        if (!Statuses.Remove(status)) return;
+        if(!Statuses.Remove(status)) return;
 
         AddTextShown.Remove(status.GUID);
         RemTextShown.Remove(status.GUID);
 
-        if (triggerEvent) NeedFireEvent = true;
+        if(triggerEvent) NeedFireEvent = true;
     }
 
     // Perform an add or update on statuses, ignoring lock validation.
     // Only performed from certain IPC calls.
     public MyStatus? AddOrUpdateLocked(MyStatus newStatus, bool triggerEvent = true)
     {
-        if (!newStatus.IsNotNull())
+        if(!newStatus.IsNotNull())
         {
             PluginLog.Error($"Status {newStatus} was not added because it is null");
             return null;
         }
 
-        for (var i = 0; i < Statuses.Count; i++)
+        for(var i = 0; i < Statuses.Count; i++)
         {
             // We are updating one, so we will ultimately return early.
-            if (Statuses[i].GUID == newStatus.GUID)
+            if(Statuses[i].GUID == newStatus.GUID)
             {
                 CheckAndUpdateStacks(newStatus, Statuses[i], UpdateSource.StatusTuple);
                 // If we want to persist time on reapplication, do so.
-                if (Statuses[i].Modifiers.Has(Modifiers.PersistExpireTime))
+                if(Statuses[i].Modifiers.Has(Modifiers.PersistExpireTime))
                 {
                     newStatus.ExpiresAt = Statuses[i].ExpiresAt;
                 }
@@ -68,12 +68,12 @@ public class MyStatusManager
                 // Update the status.
                 Statuses[i] = newStatus;
                 // fire trigger if needed and then early return.
-                if (triggerEvent) NeedFireEvent = true;
+                if(triggerEvent) NeedFireEvent = true;
                 return Statuses[i];
             }
         }
         // if it was new, fire event if needed and add it.
-        if (triggerEvent) NeedFireEvent = true;
+        if(triggerEvent) NeedFireEvent = true;
         Statuses.Add(newStatus);
         LockedIds.Add(newStatus.GUID);
         return newStatus;
@@ -82,61 +82,61 @@ public class MyStatusManager
     public MyStatus? AddOrUpdate(MyStatus newStatus, UpdateSource source, bool Unchecked = false, bool triggerEvent = true)
     {
         // Fail additions or updates for statuses that are locked.
-        if (LockedIds.Contains(newStatus.GUID)) return null;
+        if(LockedIds.Contains(newStatus.GUID)) return null;
 
-        if (!newStatus.IsNotNull())
+        if(!newStatus.IsNotNull())
         {
             PluginLog.Error($"Status {newStatus} was not added because it is null");
             return null;
         }
         // Do not add statuses with invalid data
-        if (!Unchecked)
+        if(!Unchecked)
         {
-            if (!newStatus.IsValid(out var error))
+            if(!newStatus.IsValid(out var error))
             {
                 Notify.Error(error);
                 return null;
             }
         }
 
-        for (var i = 0; i < Statuses.Count; i++)
+        for(var i = 0; i < Statuses.Count; i++)
         {
             // We are updating one, so we will ultimately return early.
-            if (Statuses[i].GUID == newStatus.GUID)
+            if(Statuses[i].GUID == newStatus.GUID)
             {
                 CheckAndUpdateStacks(newStatus, Statuses[i], source);
                 // If we want to persist time on reapplication, do so.
-                if (Statuses[i].Modifiers.Has(Modifiers.PersistExpireTime))
+                if(Statuses[i].Modifiers.Has(Modifiers.PersistExpireTime))
                 {
                     newStatus.ExpiresAt = Statuses[i].ExpiresAt;
                 }
                 // Update the status.
                 Statuses[i] = newStatus;
                 // fire trigger if needed and then early return.
-                if (triggerEvent) NeedFireEvent = true;
+                if(triggerEvent) NeedFireEvent = true;
                 return Statuses[i];
             }
         }
         // if it was new, fire event if needed and add it.
-        if (triggerEvent) NeedFireEvent = true;
+        if(triggerEvent) NeedFireEvent = true;
         Statuses.Add(newStatus);
         return newStatus;
     }
 
     private void CheckAndUpdateStacks(MyStatus newStatus, MyStatus existing, UpdateSource source)
     {
-        if (!newStatus.Modifiers.Has(Modifiers.StacksIncrease)) return;
+        if(!newStatus.Modifiers.Has(Modifiers.StacksIncrease)) return;
 
         // For DataStrings, simply remove the AddTextShown to ensure it displays with the latest stacks.
-        if (source is UpdateSource.DataString)
+        if(source is UpdateSource.DataString)
         {
-            if (existing.Stacks != newStatus.Stacks)
+            if(existing.Stacks != newStatus.Stacks)
             {
                 AddTextShown.Remove(newStatus.GUID);
             }
         }
         // Otherwise, for status tuples, perform all logic associated with stack increases.
-        else if (source is UpdateSource.StatusTuple && P.CommonProcessor.IconStackCounts.TryGetValue((uint)newStatus.IconID, out var max))
+        else if(source is UpdateSource.StatusTuple && P.CommonProcessor.IconStackCounts.TryGetValue((uint)newStatus.IconID, out var max))
         {
             UpdateStackLogic(newStatus, existing, (int)max);
         }
@@ -148,17 +148,17 @@ public class MyStatusManager
     {
         var curStacks = cur.Stacks;
         // Current + Increase < max. (Just add it)
-        if (curStacks + ns.StackSteps < max)
+        if(curStacks + ns.StackSteps < max)
         {
             // Update stacks, ensure text will be shown.
             ns.Stacks = curStacks + ns.StackSteps;
             AddTextShown.Remove(ns.GUID);
         }
         // Current stacks are not max, but adding it will go over.
-        else if (curStacks != max && curStacks + ns.StackSteps >= max)
+        else if(curStacks != max && curStacks + ns.StackSteps >= max)
         {
             // If the chain trigger is set and we want to do it on max stacks, update.
-            if (cur.ChainedStatus != Guid.Empty && cur.ChainTrigger is ChainTrigger.HitMaxStacks)
+            if(cur.ChainedStatus != Guid.Empty && cur.ChainTrigger is ChainTrigger.HitMaxStacks)
             {
                 // Set ApplyChain to true.
                 ns.ApplyChain = true;
@@ -182,14 +182,14 @@ public class MyStatusManager
     public void Cancel(Guid id, bool triggerEvent = true)
     {
         // If we are not allowed to remove the status, return.
-        if (LockedIds.Contains(id)) return;
+        if(LockedIds.Contains(id)) return;
 
-        foreach (var stat in Statuses)
+        foreach(var stat in Statuses)
         {
-            if (stat.GUID == id)
+            if(stat.GUID == id)
             {
                 stat.ExpiresAt = 0;
-                if (triggerEvent) NeedFireEvent = true;
+                if(triggerEvent) NeedFireEvent = true;
             }
         }
     }
@@ -199,11 +199,11 @@ public class MyStatusManager
     public void ApplyPreset(Preset p)
     {
         var Ignore = Statuses.Where(x => x.Persistent).Select(x => x.GUID).ToList();
-        if (p.ApplicationType == PresetApplicationType.ReplaceAll)
+        if(p.ApplicationType == PresetApplicationType.ReplaceAll)
         {
-            foreach (var x in Statuses)
+            foreach(var x in Statuses)
             {
-                if (!x.Persistent && !p.Statuses.Contains(x.GUID))
+                if(!x.Persistent && !p.Statuses.Contains(x.GUID))
                 {
                     //this.AddTextShown.Remove(x.GUID);
                     //x.GUID = Guid.NewGuid();
@@ -212,18 +212,18 @@ public class MyStatusManager
                 }
             }
         }
-        if (p.ApplicationType == PresetApplicationType.IgnoreExisting)
+        if(p.ApplicationType == PresetApplicationType.IgnoreExisting)
         {
-            foreach (var x in Statuses)
+            foreach(var x in Statuses)
             {
                 Ignore.Add(x.GUID);
             }
         }
-        foreach (var x in p.Statuses)
+        foreach(var x in p.Statuses)
         {
-            if (C.SavedStatuses.TryGetFirst(z => z.GUID == x, out var status))
+            if(C.SavedStatuses.TryGetFirst(z => z.GUID == x, out var status))
             {
-                if (!Ignore.Contains(status.GUID))
+                if(!Ignore.Contains(status.GUID))
                 {
                     AddOrUpdate(Utils.PrepareToApply(status), UpdateSource.StatusTuple);
                 }
@@ -234,9 +234,9 @@ public class MyStatusManager
     // Any locked statuses will not be removed.
     public void RemovePreset(Preset p)
     {
-        foreach (var x in p.Statuses)
+        foreach(var x in p.Statuses)
         {
-            if (C.SavedStatuses.TryGetFirst(z => z.GUID == x, out var status))
+            if(C.SavedStatuses.TryGetFirst(z => z.GUID == x, out var status))
             {
                 Cancel(status);
             }
@@ -250,13 +250,13 @@ public class MyStatusManager
 
     public string SerializeToBase64()
     {
-        if (Statuses.Count == 0) return string.Empty;
+        if(Statuses.Count == 0) return string.Empty;
         return Convert.ToBase64String(BinarySerialize());
     }
 
     public List<MoodlesStatusInfo> GetActiveStatusInfo()
     {
-        if (Statuses.Count == 0) return [];
+        if(Statuses.Count == 0) return [];
         return Statuses.Select(x => x.ToStatusTuple()).ToList();
     }
 
@@ -266,7 +266,7 @@ public class MyStatusManager
         {
             // Attempt to deserialize into the current format. If it fails, warn of old formatting.
             var statuses = MemoryPackSerializer.Deserialize<List<MyStatus>>(data, SerializerOptions);
-            if (statuses != null)
+            if(statuses != null)
             {
                 SetStatusesAsEphemeral(statuses, source);
             }
@@ -284,7 +284,7 @@ public class MyStatusManager
 
     public void Apply(string base64string, UpdateSource source = UpdateSource.DataString)
     {
-        if (base64string.IsNullOrEmpty())
+        if(base64string.IsNullOrEmpty())
         {
             SetStatusesAsEphemeral(Array.Empty<MyStatus>(), source);
         }
@@ -298,16 +298,16 @@ public class MyStatusManager
     {
         try
         {
-            foreach (var x in Statuses)
+            foreach(var x in Statuses)
             {
-                if (!newStatusList.Any(n => n.GUID == x.GUID))
+                if(!newStatusList.Any(n => n.GUID == x.GUID))
                 {
                     x.ExpiresAt = 0;
                 }
             }
-            foreach (var x in newStatusList)
+            foreach(var x in newStatusList)
             {
-                if (x.ExpiresAt > Utils.Time)
+                if(x.ExpiresAt > Utils.Time)
                 {
                     AddOrUpdate(x, source, true, false);
                 }
@@ -328,10 +328,10 @@ public class MyStatusManager
     public bool ContainsStatus(Guid status)
     {
         var statusCount = Statuses.Count;
-        for (var i = 0; i < statusCount; i++)
+        for(var i = 0; i < statusCount; i++)
         {
             var curStatus = Statuses[i];
-            if (curStatus.GUID == status)
+            if(curStatus.GUID == status)
             {
                 return true;
             }
@@ -343,10 +343,10 @@ public class MyStatusManager
     public bool ContainsPreset(Preset preset)
     {
         var statusCount = preset.Statuses.Count;
-        for (var i = 0; i < statusCount; i++)
+        for(var i = 0; i < statusCount; i++)
         {
             var statusGUID = preset.Statuses[i];
-            if (!ContainsStatus(statusGUID))
+            if(!ContainsStatus(statusGUID))
             {
                 return false;
             }

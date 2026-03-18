@@ -49,15 +49,15 @@ public unsafe class StatusProcessor : IDisposable
 
     private void AddonRequestedUpdate(AtkUnitBase* addonBase)
     {
-        if (P == null) return;
+        if(P == null) return;
 
-        if (addonBase != null && IsAddonReady(addonBase) && P.CanModifyUI())
+        if(addonBase != null && IsAddonReady(addonBase) && P.CanModifyUI())
         {
             NumStatuses = 0;
-            for (var i = 25; i >= 1; i--)
+            for(var i = 25; i >= 1; i--)
             {
                 var c = addonBase->UldManager.NodeList[i];
-                if (c->IsVisible())
+                if(c->IsVisible())
                 {
                     NumStatuses++;
                 }
@@ -82,7 +82,7 @@ public unsafe class StatusProcessor : IDisposable
             for(var i = baseCnt; i >= 1; i--)
             {
                 var c = addon->UldManager.NodeList[i];
-                if (c->IsVisible()) c->NodeFlags ^= NodeFlags.Visible;
+                if(c->IsVisible()) c->NodeFlags ^= NodeFlags.Visible;
             }
             if(!hideAll)
             {

@@ -84,13 +84,13 @@ public static class TabAutomation
                 {
                     var targetPlayer = CharaWatcher.PlayerTarget;
                     var dis = targetPlayer == null;
-                    if (dis) ImGui.BeginDisabled();
-                    if (ImGui.Button("Set to Target", buttonSize))
+                    if(dis) ImGui.BeginDisabled();
+                    if(ImGui.Button("Set to Target", buttonSize))
                     {
                         Selected.World = targetPlayer->HomeWorld;
                         Selected.Character = targetPlayer->NameString;
                     }
-                    if (dis) ImGui.EndDisabled();
+                    if(dis) ImGui.EndDisabled();
                 }
             }
         }

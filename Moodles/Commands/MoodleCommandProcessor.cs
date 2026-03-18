@@ -119,12 +119,12 @@ public static class MoodleCommandProcessor
         var sm = GetStatusManager(targetState);
         var myStatuses = GetMyStatus(moodleNameType);
 
-        foreach (var myStatus in myStatuses)
+        foreach(var myStatus in myStatuses)
         {
 
-            if (moodleState == MoodleState.Toggle)
+            if(moodleState == MoodleState.Toggle)
             {
-                if (sm.ContainsStatus(myStatus))
+                if(sm.ContainsStatus(myStatus))
                 {
                     moodleState = MoodleState.Remove;
                 }
@@ -134,11 +134,11 @@ public static class MoodleCommandProcessor
                 }
             }
 
-            if (moodleState == MoodleState.Apply)
+            if(moodleState == MoodleState.Apply)
             {
                 sm.AddOrUpdate(myStatus.PrepareToApply(myStatus.Persistent ? PrepareOptions.Persistent : PrepareOptions.NoOption), UpdateSource.StatusTuple);
             }
-            else if (moodleState == MoodleState.Remove)
+            else if(moodleState == MoodleState.Remove)
             {
                 sm.Cancel(myStatus);
             }
@@ -150,11 +150,11 @@ public static class MoodleCommandProcessor
         var statusManager = GetStatusManager(targetState);
         var myPresets = GetMyPreset(moodleNameType);
 
-        foreach (var myPreset in myPresets)
+        foreach(var myPreset in myPresets)
         {
-            if (moodleState == MoodleState.Toggle)
+            if(moodleState == MoodleState.Toggle)
             {
-                if (statusManager.ContainsPreset(myPreset))
+                if(statusManager.ContainsPreset(myPreset))
                 {
                     moodleState = MoodleState.Remove;
                 }
@@ -164,11 +164,11 @@ public static class MoodleCommandProcessor
                 }
             }
 
-            if (moodleState == MoodleState.Apply)
+            if(moodleState == MoodleState.Apply)
             {
                 statusManager.ApplyPreset(myPreset);
             }
-            else if (moodleState == MoodleState.Remove)
+            else if(moodleState == MoodleState.Remove)
             {
                 statusManager.RemovePreset(myPreset);
             }
@@ -258,7 +258,7 @@ public static class MoodleCommandProcessor
         if(moodleState == MoodleState.Apply)
         {
             selectedProfile.Character = chara->NameString;
-            if (hasWorld)
+            if(hasWorld)
             {
                 selectedProfile.World = chara->HomeWorld;
             }
@@ -322,7 +322,7 @@ public static class MoodleCommandProcessor
 
     private static Preset[] GetMyPreset(MoodleNameType moodleNameType)
     {
-        if (moodleNameType == MoodleNameType.All)
+        if(moodleNameType == MoodleNameType.All)
         {
             return C.SavedPresets.ToArray();
         }
@@ -367,7 +367,7 @@ public static class MoodleCommandProcessor
 
     private static MyStatus[] GetMyStatus(MoodleNameType moodleNameType)
     {
-        if (moodleNameType == MoodleNameType.All)
+        if(moodleNameType == MoodleNameType.All)
         {
             return C.SavedStatuses.ToArray();
         }
@@ -518,11 +518,11 @@ public static class MoodleCommandProcessor
     {
         var commandString = GetCommandPart(commandArgs, 3);
 
-        if (commandString == "all")
+        if(commandString == "all")
         {
             return MoodleNameType.All;
         }
-        else if (commandString != CUSTOM_TAG)
+        else if(commandString != CUSTOM_TAG)
         {
             return MoodleNameType.INVALID;
         }

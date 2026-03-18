@@ -20,7 +20,7 @@ public sealed class MoodleFileSystem : FileSystem<MyStatus>, IDisposable
         try
         {
             var info = new FileInfo(FilePath);
-            if (info.Exists)
+            if(info.Exists)
             {
                 Load(info, C.SavedStatuses, ConvertToIdentifier, ConvertToName);
             }
@@ -63,10 +63,10 @@ public sealed class MoodleFileSystem : FileSystem<MyStatus>, IDisposable
     public bool TryGetPathByID(Guid id, [NotNullWhen(true)] out string? path)
     {
         path = default;
-        if (C.SavedStatuses.FirstOrDefault(x => x.GUID == id) is not { } status)
+        if(C.SavedStatuses.FirstOrDefault(x => x.GUID == id) is not { } status)
             return false;
 
-        if (FindLeaf(status, out var leaf))
+        if(FindLeaf(status, out var leaf))
         {
             path = leaf.FullName();
             return true;
@@ -104,7 +104,7 @@ public sealed class MoodleFileSystem : FileSystem<MyStatus>, IDisposable
 
     private (string, bool) SaveConverter(MyStatus status, string arg2)
     {
-        if (C.DebugSaves) PluginLog.LogVerbose($"Saving {status.Title}  {status.ID}");
+        if(C.DebugSaves) PluginLog.LogVerbose($"Saving {status.Title}  {status.ID}");
         return (status.ID, true);
     }
 
@@ -140,7 +140,7 @@ public sealed class MoodleFileSystem : FileSystem<MyStatus>, IDisposable
         {
             base.SetSize(size);
             var adaptedSize = MathF.Round(size.X / ImUtf8.GlobalScale);
-            if (adaptedSize == C.SelectorWidthMoodles)
+            if(adaptedSize == C.SelectorWidthMoodles)
                 return;
 
             C.SelectorWidthMoodles = adaptedSize;

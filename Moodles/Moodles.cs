@@ -67,7 +67,7 @@ public class Moodles : IDalamudPlugin
 
     private void ToggleUi(string _, string __)
     {
-        if (EzConfigGui.Window is { } window)
+        if(EzConfigGui.Window is { } window)
         {
             window.IsOpen = !EzConfigGui.Window.IsOpen;
         }
@@ -129,13 +129,13 @@ public class Moodles : IDalamudPlugin
             }
 
             // Need this Tick() check because someone could become a Sundouleia user after being rendered.
-            foreach (Character* chara in CharaWatcher.Rendered)
+            foreach(Character* chara in CharaWatcher.Rendered)
             {
-                if (chara == LocalPlayer.Character) continue;
+                if(chara == LocalPlayer.Character) continue;
 
-                if (chara->MyStatusManager() is { } sm)
+                if(chara->MyStatusManager() is { } sm)
                 {
-                    if (sm.Ephemeral)
+                    if(sm.Ephemeral)
                     {
                         PluginLog.Debug($"{chara->GetNameWithWorld()} Sundouleia player removed from rendering. Cleaning up ephemeral status manager.");
                         // Mark them as no longer Ephemeral.
@@ -196,23 +196,23 @@ public class Moodles : IDalamudPlugin
     {
         List<(string Name, Job Job)> newSeenPlayers = [];
         // Only iterate rendered characters.
-        foreach (Character* chara in CharaWatcher.Rendered)
+        foreach(Character* chara in CharaWatcher.Rendered)
         {
-            if ((nint)chara == LocalPlayer.Address) continue;
+            if((nint)chara == LocalPlayer.Address) continue;
 
             var nameWorld = chara->GetNameWithWorld();
             var identifier = (nameWorld, (Job)chara->ClassJob);
             
             // Do logic on unseen players only.
-            if (SeenPlayers.Contains(identifier)) continue;
+            if(SeenPlayers.Contains(identifier)) continue;
 
             // Perform Automation logic.
             PluginLog.Debug($"Begin apply automation for {identifier}");
             var mySM = chara->MyStatusManager();
 
-            foreach (var x in chara->GetSuitableAutomation())
+            foreach(var x in chara->GetSuitableAutomation())
             {
-                if (C.SavedPresets.TryGetFirst(a => a.GUID == x.Preset, out var p))
+                if(C.SavedPresets.TryGetFirst(a => a.GUID == x.Preset, out var p))
                 {
                     PluginLog.Debug($"Applied preset {p.ID} / {p.Statuses.Select(z => C.SavedStatuses.FirstOrDefault(s => s.GUID == z)?.Title)}");
                     mySM.ApplyPreset(p);

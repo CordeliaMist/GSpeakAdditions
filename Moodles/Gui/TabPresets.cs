@@ -58,12 +58,12 @@ public static class TabPresets
             };
             var dis = targetMode is TargetApplyMode.NoTarget;
 
-            if (dis) ImGui.BeginDisabled();
-            if (ImGui.Button(buttonText))
+            if(dis) ImGui.BeginDisabled();
+            if(ImGui.Button(buttonText))
             {
                 ApplyToTarget(targetMode);
             }
-            if (dis) ImGui.EndDisabled();
+            if(dis) ImGui.EndDisabled();
 
             ImGui.Separator();
 
@@ -75,7 +75,7 @@ public static class TabPresets
             }
 
             ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X - 150);
-            if (ImGuiEx.EnumCombo("Application Effect##on", ref Selected.ApplicationType, ApplicationTypes))
+            if(ImGuiEx.EnumCombo("Application Effect##on", ref Selected.ApplicationType, ApplicationTypes))
             {
                 P.IPCProcessor.PresetUpdated(Selected.GUID, false);
             }
@@ -229,7 +229,7 @@ public static class TabPresets
 
     public static unsafe void ApplyToTarget(TargetApplyMode mode)
     {
-        if (!CharaWatcher.TryGetValue(Svc.Targets.Target?.Address ?? nint.Zero, out Character* chara))
+        if(!CharaWatcher.TryGetValue(Svc.Targets.Target?.Address ?? nint.Zero, out Character* chara))
             return;
         try
         {

@@ -37,7 +37,7 @@ public sealed class PresetFileSystem : FileSystem<Preset>, IDisposable
     public bool TryGetPathByID(Guid id, [NotNullWhen(true)] out string? path)
     {
         path = default;
-        if (C.SavedPresets.FirstOrDefault(x => x.GUID == id) is not { } preset)
+        if(C.SavedPresets.FirstOrDefault(x => x.GUID == id) is not { } preset)
             return false;
 
         if(FindLeaf(preset, out var leaf))
@@ -58,7 +58,7 @@ public sealed class PresetFileSystem : FileSystem<Preset>, IDisposable
         PluginLog.Debug($"Deleting {item.ID}");
         C.SavedPresets.Remove(item);
         P.IPCProcessor.PresetUpdated(item.GUID, true);
-        if (FindLeaf(item, out var leaf))
+        if(FindLeaf(item, out var leaf))
         {
             Delete(leaf);
         }
@@ -102,7 +102,7 @@ public sealed class PresetFileSystem : FileSystem<Preset>, IDisposable
 
     private (string, bool) SaveConverter(Preset item, string arg2)
     {
-        if (C.DebugSaves) PluginLog.LogVerbose($"Saving {item.ID}");
+        if(C.DebugSaves) PluginLog.LogVerbose($"Saving {item.ID}");
         return (item.ID, true);
     }
 
@@ -138,7 +138,7 @@ public sealed class PresetFileSystem : FileSystem<Preset>, IDisposable
         {
             base.SetSize(size);
             var adaptedSize = MathF.Round(size.X / ImUtf8.GlobalScale);
-            if (adaptedSize == C.SelectorWidthPresets)
+            if(adaptedSize == C.SelectorWidthPresets)
                 return;
 
             C.SelectorWidthPresets = adaptedSize;

@@ -19,14 +19,14 @@ public class MoodleSerializationFactory : DefaultSerializationFactory
     public static void BackupOldConfigs()
     {
         var configPath = EzConfig.DefaultConfigurationFileName;
-        if (!File.Exists(configPath))
+        if(!File.Exists(configPath))
             return;
 
         // Backup the files if they used legacy configs to have in the case things break a bit.
         try
         {
             var j = JObject.Parse(File.ReadAllText(configPath, Encoding.UTF8));
-            if (j["Version"] != null)
+            if(j["Version"] != null)
             {
                 PluginLog.Information($"No backup needed for configs, a valid version is detected).");
             }
@@ -35,12 +35,12 @@ public class MoodleSerializationFactory : DefaultSerializationFactory
                 var configDir = EzConfig.GetPluginConfigDirectory();
                 var backupFolder = Path.Combine(EzConfig.GetPluginConfigDirectory(), "MigrationBackup");
                 Directory.CreateDirectory(backupFolder);
-                foreach (var file in Directory.GetFiles(configDir, "*", SearchOption.TopDirectoryOnly))
+                foreach(var file in Directory.GetFiles(configDir, "*", SearchOption.TopDirectoryOnly))
                 {
                     try
                     {
                         var dest = Path.Combine(backupFolder, Path.GetFileName(file));
-                        if (!File.Exists(dest)) File.Copy(file, dest);
+                        if(!File.Exists(dest)) File.Copy(file, dest);
                     }
                     catch (Exception copyEx)
                     {
@@ -60,7 +60,7 @@ public class MoodleSerializationFactory : DefaultSerializationFactory
         // Get the deserializer settings.
         var type = typeof(T).GetFieldPropertyUnion("JsonSerializerSettings", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
         JsonSerializerSettings settings;
-        if (type != null && type.GetValue(null) is JsonSerializerSettings s)
+        if(type != null && type.GetValue(null) is JsonSerializerSettings s)
         {
             settings = s;
             PluginLog.Verbose($"Using JSON serializer settings from object to perform deserialization");
@@ -74,7 +74,7 @@ public class MoodleSerializationFactory : DefaultSerializationFactory
         }
 
         // If the type supports migration, use the migratable path
-        if (IsMigratableObject(typeof(T)))
+        if(IsMigratableObject(typeof(T)))
             return DeserializeMigratable<T>(inputData, settings);
 
         return JsonConvert.DeserializeObject<T>(inputData, settings) ?? throw new InvalidOperationException($"Deserialization of type {typeof(T).FullName} resulted in null value.");
@@ -88,17 +88,17 @@ public class MoodleSerializationFactory : DefaultSerializationFactory
         var jObj = JObject.Parse(inputData);
         var version = jObj["Version"]?.Value<int>() ?? 1;
         // Check based on the type.
-        if (typeof(T) == typeof(Config))
+        if(typeof(T) == typeof(Config))
         {
-            if (version < 2)
+            if(version < 2)
             {
                 jObj = MigrateConfigToV2(jObj);
                 PluginLog.Information("Migrated Config to V2.");
             }
         }
-        else if (typeof(T) == typeof(MyStatus))
+        else if(typeof(T) == typeof(MyStatus))
         {
-            if (version < 2)
+            if(version < 2)
             {
                 MigrateStatusToV2(jObj);
                 PluginLog.Information($"Migrating Status to V2");
@@ -114,21 +114,21 @@ public class MoodleSerializationFactory : DefaultSerializationFactory
     {
         old["Version"] = 2;
         // Migrate StatusManagers
-        if (old["StatusManagers"] is JObject managers)
+        if(old["StatusManagers"] is JObject managers)
         {
-            foreach (var manager in managers.Properties())
+            foreach(var manager in managers.Properties())
             {
-                if (manager.Value["Statuses"] is JArray statuses)
+                if(manager.Value["Statuses"] is JArray statuses)
                 {
-                    foreach (JObject statusObj in statuses)
+                    foreach(JObject statusObj in statuses)
                         MigrateStatusToV2(statusObj);
                 }
             }
         }
         // Migrate SavedStatuses
-        if (old["SavedStatuses"] is JArray saved)
+        if(old["SavedStatuses"] is JArray saved)
         {
-            foreach (JObject statusObj in saved)
+            foreach(JObject statusObj in saved)
                 MigrateStatusToV2(statusObj);
         }
         return old;
@@ -145,9 +145,9 @@ public class MoodleSerializationFactory : DefaultSerializationFactory
 
         // New Modifiers
         Modifiers modifiers = Modifiers.None;
-        if (wasDispellable) modifiers |= Modifiers.CanDispel;
-        if (stacksIncreased) modifiers |= Modifiers.StacksIncrease;
-        if (stacksTransferred) modifiers |= Modifiers.StacksMoveToChain;
+        if(wasDispellable) modifiers |= Modifiers.CanDispel;
+        if(stacksIncreased) modifiers |= Modifiers.StacksIncrease;
+        if(stacksTransferred) modifiers |= Modifiers.StacksMoveToChain;
 
         // Add new fields
         jObj["StackSteps"] = stackSteps;

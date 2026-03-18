@@ -30,14 +30,14 @@ public class AutomationList : ItemSelector<AutomationProfile>
         {
             unsafe
             {
-                foreach (Character* chara in CharaWatcher.Rendered)
+                foreach(Character* chara in CharaWatcher.Rendered)
                 {
-                    if (chara->GetSuitableAutomation().ContainsAny(p.Combos))
+                    if(chara->GetSuitableAutomation().ContainsAny(p.Combos))
                     {
                         col = true;
                         ImGui.PushStyleColor(ImGuiCol.Text, ImGuiEx.Vector4FromRGB(0x3fd969));
                     }
-                    if (!C.AutoOther) break;
+                    if(!C.AutoOther) break;
                 }
             }
         }
@@ -55,7 +55,7 @@ public class AutomationList : ItemSelector<AutomationProfile>
         ImGuiEx.Text($"{text}");
         ImGui.SetCursorPos(cur2);
 
-        if (col) ImGui.PopStyleColor();
+        if(col) ImGui.PopStyleColor();
         return ret;
     }
 

@@ -23,10 +23,10 @@ public static unsafe class CharacterUtils
     public static unsafe nint[] GetTargetablePlayers()
     {
         var list = new List<nint>();
-        foreach (Character* chara in CharaWatcher.Rendered)
+        foreach(Character* chara in CharaWatcher.Rendered)
         {
-            if (chara is null) continue;
-            if (!chara->GetIsTargetable()) continue;
+            if(chara is null) continue;
+            if(!chara->GetIsTargetable()) continue;
             // Append to the returns.
             list.Add((nint)chara);
         }
@@ -40,13 +40,13 @@ public static unsafe class CharacterUtils
 
     public static IEnumerable<AutomationCombo> GetSuitableAutomation(this Character chara)
     {
-        foreach (var x in C.AutomationProfiles)
+        foreach(var x in C.AutomationProfiles)
         {
-            if (x.Enabled && x.Character == chara.NameString && (x.World == 0 || x.World == chara.HomeWorld))
+            if(x.Enabled && x.Character == chara.NameString && (x.World == 0 || x.World == chara.HomeWorld))
             {
-                foreach (var c in x.Combos)
+                foreach(var c in x.Combos)
                 {
-                    if (c.Jobs.Count == 0 || c.Jobs.Contains((Job)chara.ClassJob))
+                    if(c.Jobs.Count == 0 || c.Jobs.Contains((Job)chara.ClassJob))
                     {
                         yield return c;
                     }
@@ -62,9 +62,9 @@ public static unsafe class CharacterUtils
 
     public static bool CanSpawnFlyText(this Character targetChara)
     {
-        if (!targetChara.GetIsTargetable()) return false;
-        if (!LocalPlayer.Interactable) return false;
-        if (Svc.Condition[ConditionFlag.OccupiedInCutSceneEvent]
+        if(!targetChara.GetIsTargetable()) return false;
+        if(!LocalPlayer.Interactable) return false;
+        if(Svc.Condition[ConditionFlag.OccupiedInCutSceneEvent]
             || Svc.Condition[ConditionFlag.WatchingCutscene]
             || Svc.Condition[ConditionFlag.WatchingCutscene78]
             || Svc.Condition[ConditionFlag.OccupiedInQuestEvent]
@@ -91,15 +91,15 @@ public static unsafe class CharacterUtils
     {
         nint addr = (nint)character;
         // Invalid address.
-        if (addr == nint.Zero) return false;
+        if(addr == nint.Zero) return false;
         // DrawObject does not exist yet.
-        if ((nint)character->DrawObject == nint.Zero) return false;
+        if((nint)character->DrawObject == nint.Zero) return false;
         // RenderFlags are marked as 'still loading'.
-        if ((ulong)character->RenderFlags == 2048) return false;
+        if((ulong)character->RenderFlags == 2048) return false;
         // There are models loaded into slots, still being applied.
-        if (((CharacterBase*)character->DrawObject)->HasModelInSlotLoaded != 0) return false;
+        if(((CharacterBase*)character->DrawObject)->HasModelInSlotLoaded != 0) return false;
         // There are model files loaded into slots, still being applied.
-        if (((CharacterBase*)character->DrawObject)->HasModelFilesInSlotLoaded != 0) return false;
+        if(((CharacterBase*)character->DrawObject)->HasModelFilesInSlotLoaded != 0) return false;
         // Object is fully loaded.
         return true;
     }

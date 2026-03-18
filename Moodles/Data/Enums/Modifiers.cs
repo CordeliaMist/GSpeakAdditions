@@ -49,7 +49,7 @@ public static class ModifierExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Set(ref this Modifiers value, Modifiers flag, bool enabled)
     {
-        if (enabled) value |= flag;
+        if(enabled) value |= flag;
         else value &= ~flag;
     }
 

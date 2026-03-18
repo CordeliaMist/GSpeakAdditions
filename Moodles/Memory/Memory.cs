@@ -24,16 +24,16 @@ public unsafe partial class Memory : IDisposable
         try
         {
             //PluginLog.Debug($"{a1:X16}, {a2}, {a3:X16}, {a4:X16}, {a5:X16}");
-            if (a2 == 6)
+            if(a2 == 6)
             {
                 P.CommonProcessor.HoveringOver = a1;
             }
-            if (a2 == 7)
+            if(a2 == 7)
             {
                 P.CommonProcessor.HoveringOver = 0;
             }
             // Handle Cancellation Request on Right Click
-            if (a2 == 9 && P.CommonProcessor.WasRightMousePressed)
+            if(a2 == 9 && P.CommonProcessor.WasRightMousePressed)
             {
                 // We dunno what status this is yet, so mark the address for next check.
                 P.CommonProcessor.CancelRequests.Add(a1);
@@ -69,7 +69,7 @@ public unsafe partial class Memory : IDisposable
         try
         {
             string smallPath = Utils.FindVFXPathByIconID(iconID);
-            if (smallPath.IsNullOrWhitespace())
+            if(smallPath.IsNullOrWhitespace())
             {
                 PluginLog.Information($"Path for IconID: {iconID} is empty");
                 return;
@@ -87,7 +87,7 @@ public unsafe partial class Memory : IDisposable
     {
         try
         {
-            if (path.IsNullOrWhitespace())
+            if(path.IsNullOrWhitespace())
             {
                 PluginLog.Information($"Path for SHE is empty");
                 return;

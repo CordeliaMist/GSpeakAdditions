@@ -113,9 +113,9 @@ public unsafe class StatusCustomProcessor : IDisposable
                 }
             }
 
-            if (lastStatusCount != StatusCnt)
+            if(lastStatusCount != StatusCnt)
             {
-                if (StatusCnt < lastStatusCount)
+                if(StatusCnt < lastStatusCount)
                 {
                     statusCountLessened = true;
                 }
@@ -175,7 +175,7 @@ public unsafe class StatusCustomProcessor : IDisposable
             for(var i = baseCnt; i >= 5; i--)
             {
                 var c = addon->UldManager.NodeList[i];
-                if (c->IsVisible()) c->NodeFlags ^= NodeFlags.Visible;
+                if(c->IsVisible()) c->NodeFlags ^= NodeFlags.Visible;
             }
             if(!hideAll)
             {
@@ -183,9 +183,9 @@ public unsafe class StatusCustomProcessor : IDisposable
                 {
                     if(baseCnt < 5) break;
                     var rem = x.ExpiresAt - Utils.Time;
-                    if (rem > 0)
+                    if(rem > 0)
                     {
-                        if (statusCountLessened)
+                        if(statusCountLessened)
                         {
                             statusCountLessened = false;
                             SetIcon(addon, baseCnt - P.CommonProcessor.CancelRequests.Count, x);

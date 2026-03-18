@@ -9,9 +9,9 @@ public unsafe partial class Memory
         try
         {
             PluginLog.Information($"ActorControlPacket: {a1:X8}, {a2:X8}, {a3:X8}, {a4:X8}, {a5:X8}, {a6:X8}, {a7:X8}, {a8:X8}, {a9:X16}, {a10:X2}");
-            if (UI.Suppress)
+            if(UI.Suppress)
             {
-                if (a2 == UI.Opcode)
+                if(a2 == UI.Opcode)
                 {
                     PluginLog.Information($"Suppressing");
                     return;
@@ -34,9 +34,9 @@ public unsafe partial class Memory
         try
         {
             var opcode = *(ushort*)(a3 + 2);
-            if (UI.Suppress)
+            if(UI.Suppress)
             {
-                if (opcode == UI.Opcode)
+                if(opcode == UI.Opcode)
                 {
                     PluginLog.Information($"Suppressing");
                     return;
@@ -60,7 +60,7 @@ public unsafe partial class Memory
         try
         {
             PluginLog.Debug($"{a1:X16}, {a2:X8}, {a3}");
-            if (UI.Suppress) return 0;
+            if(UI.Suppress) return 0;
         }
         catch (Exception e)
         {

@@ -50,17 +50,17 @@ public unsafe class CharaWatcher : IDisposable
     {
         var objects = GameObjectManager.Instance();
         // Standard Actor Handling.
-        for (var i = 0; i < 200; i++)
+        for(var i = 0; i < 200; i++)
         {
             GameObject* obj = objects->Objects.IndexSorted[i];
-            if (obj is null)
+            if(obj is null)
                 continue;
 
             // Only process characters.
-            if (!obj->IsCharacter())
+            if(!obj->IsCharacter())
                 continue;
 
-            if (obj->GetObjectKind() is not (ObjectKind.Pc))
+            if(obj->GetObjectKind() is not (ObjectKind.Pc))
             {
                 PluginLog.Verbose($"[CharaWatcher] Skipping found character of object kind {obj->GetObjectKind()} at index {i}");
                 continue;
@@ -84,9 +84,9 @@ public unsafe class CharaWatcher : IDisposable
 
     public static bool TryGetFirst(Func<Character, bool> predicate, [NotNullWhen(true)] out nint charaAddr)
     {
-        foreach (Character* addr in Rendered)
+        foreach(Character* addr in Rendered)
         {
-            if (predicate(*addr))
+            if(predicate(*addr))
             {
                 charaAddr = (nint)addr;
                 return true;
@@ -98,9 +98,9 @@ public unsafe class CharaWatcher : IDisposable
 
     public static unsafe bool TryGetFirstUnsafe(Func<Character, bool> predicate, [NotNullWhen(true)] out Character* character)
     {
-        foreach (Character* addr in Rendered)
+        foreach(Character* addr in Rendered)
         {
-            if (predicate(*addr))
+            if(predicate(*addr))
             {
                 character = addr;
                 return true;
@@ -115,7 +115,7 @@ public unsafe class CharaWatcher : IDisposable
     /// </summary>
     public static unsafe bool TryGetValue(nint address, [NotNullWhen(true)] out Character* character)
     {
-        if (Rendered.Contains(address))
+        if(Rendered.Contains(address))
         {
             character = (Character*)address;
             return true;
@@ -147,18 +147,18 @@ public unsafe class CharaWatcher : IDisposable
 
     private void AddToWatcher(Character* chara)
     {
-        if (chara is null
+        if(chara is null
             || chara->ObjectIndex < 0 || chara->ObjectIndex >= 200
             || chara->IsCharacter() == false
             || chara->GetObjectKind() is not ObjectKind.Pc)
             return;
 
-        if (Rendered.Add((nint)chara))
+        if(Rendered.Add((nint)chara))
         {
             var charaNameWorld = chara->GetNameWithWorld();
             PluginLog.Verbose($"Added rendered character: Rendered: {(nint)chara:X} - {charaNameWorld}");
             // If the player had an associated StatusManager, assign their Character* to it.
-            if (C.StatusManagers.TryGetValue(charaNameWorld, out var sm))
+            if(C.StatusManagers.TryGetValue(charaNameWorld, out var sm))
             {
                 PluginLog.Verbose($"Assigning {charaNameWorld} to SM. [SM Owner Null: {sm.Owner is null} | Chara Null: {chara is null}]");
                 sm.Owner = chara;
@@ -168,22 +168,22 @@ public unsafe class CharaWatcher : IDisposable
 
     private void RemoveCharacter(Character* chara)
     {
-        if (Rendered.Contains((nint)chara))
+        if(Rendered.Contains((nint)chara))
         {
-            if (Rendered.Remove((nint)chara))
+            if(Rendered.Remove((nint)chara))
             {
                 var charaNameWorld = chara->GetNameWithWorld();
                 PluginLog.Verbose($"Removed rendered character: Rendered: {(nint)chara:X} - {charaNameWorld}");
                 // If the removed character was a player with a status manager, handle Owner cleanup.
-                if (C.StatusManagers.TryGetValue(charaNameWorld, out var sm))
+                if(C.StatusManagers.TryGetValue(charaNameWorld, out var sm))
                 {
-                    if (sm.OwnerValid)
+                    if(sm.OwnerValid)
                     {
                         sm.Owner = null;
                     }
 
                     // If Ephemeral, remove their status manager and any SeenPlayers entry.
-                    if (sm.Ephemeral)
+                    if(sm.Ephemeral)
                     {
                         C.StatusManagers.Remove(charaNameWorld);
                         P.SeenPlayers.RemoveAll(x => x.Name == charaNameWorld);

@@ -29,18 +29,18 @@ public static class TabMoodles
     public static void DrawSelected()
     {
         using var child = ImRaii.Child("##Panel", -Vector2.One, true);
-        if (!child || Selected == null)
+        if(!child || Selected == null)
             return;
         
         var cur = new Vector2(ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail().X - UI.StatusIconSize.X * 2, ImGui.GetCursorPosY()) - new Vector2(10, 0);
-        if (ImGui.Button("Apply to Yourself"))
+        if(ImGui.Button("Apply to Yourself"))
         {
             Utils.GetMyStatusManager(LocalPlayer.NameWithWorld).AddOrUpdate(Selected.PrepareToApply(AsPermanent ? PrepareOptions.Persistent : PrepareOptions.NoOption), UpdateSource.StatusTuple);
         }
 
 #if DEBUG
         ImGui.SameLine();
-        if (ImGui.Button("Apply to Yourself (As Locked)"))
+        if(ImGui.Button("Apply to Yourself (As Locked)"))
         {
             Utils.GetMyStatusManager(LocalPlayer.NameWithWorld).AddOrUpdateLocked(Selected.PrepareToApply(AsPermanent ? PrepareOptions.Persistent : PrepareOptions.NoOption));
         }
@@ -57,12 +57,12 @@ public static class TabMoodles
         // Permissions are validated via internal logic behavior.
         var dis = targetMode is TargetApplyMode.NoTarget;
 
-        if (dis) ImGui.BeginDisabled();
-        if (ImGui.Button(buttonText))
+        if(dis) ImGui.BeginDisabled();
+        if(ImGui.Button(buttonText))
         {
             ApplyToTarget(targetMode);
         }
-        if (dis) ImGui.EndDisabled();
+        if(dis) ImGui.EndDisabled();
 
         // Store maxStacks before drawing further.
         var maxStacks = P.CommonProcessor.IconStackCounts.TryGetValue((uint)Selected.IconID, out var count) ? (int)count : 1;
@@ -72,7 +72,7 @@ public static class TabMoodles
         DrawStacking(maxStacks);
         DrawDispelling();
 
-        if (Selected.IconID != 0 && ThreadLoadImageHandler.TryGetIconTextureWrap(Selected.AdjustedIconID, true, out var image))
+        if(Selected.IconID != 0 && ThreadLoadImageHandler.TryGetIconTextureWrap(Selected.AdjustedIconID, true, out var image))
         {
             ImGui.SetCursorPos(cur);
             ImGui.Image(image.Handle, UI.StatusIconSize * 2);
@@ -83,7 +83,7 @@ public static class TabMoodles
     {
         ImGui.Spacing();
 
-        if (ImGui.BeginTable("##essentials", 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchSame))
+        if(ImGui.BeginTable("##essentials", 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchSame))
         {
             ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthFixed, 175f);
             ImGui.TableSetupColumn("Field", ImGuiTableColumnFlags.WidthStretch);
@@ -100,14 +100,14 @@ public static class TabMoodles
 
             ImGui.TableNextColumn();
             ImGuiEx.TextV($"Icon:");
-            if (Selected.IconID == 0)
+            if(Selected.IconID == 0)
             {
                 ImGuiEx.HelpMarker("You must select an icon", EColor.RedBright, FontAwesomeIcon.ExclamationTriangle.ToIconString());
             }
             ImGui.TableNextColumn();
             ImGuiEx.SetNextItemFullWidth();
             var selinfo = Utils.GetIconInfo((uint)Selected.IconID);
-            if (ImGui.BeginCombo("##sel", $"Icon: #{Selected.IconID} {selinfo?.Name}", ImGuiComboFlags.HeightLargest))
+            if(ImGui.BeginCombo("##sel", $"Icon: #{Selected.IconID} {selinfo?.Name}", ImGuiComboFlags.HeightLargest))
             {
                 var cursor = ImGui.GetCursorPos();
                 ImGui.Dummy(new Vector2(100, ImGuiHelpers.MainViewport.Size.Y * C.SelectorHeight / 100));
@@ -117,7 +117,7 @@ public static class TabMoodles
                 ImGui.EndCombo();
             }
             // post update to IPC if a new icon is selected.
-            if (Utils.GetIconInfo((uint)Selected.IconID)?.Name != selinfo?.Name)
+            if(Utils.GetIconInfo((uint)Selected.IconID)?.Name != selinfo?.Name)
             {
                 CleanupSelected();
                 P.IPCProcessor.StatusUpdated(Selected.GUID, false);
@@ -130,21 +130,21 @@ public static class TabMoodles
             ImGui.TableNextColumn();
             ImGuiEx.SetNextItemFullWidth();
             var currentPath = Selected.CustomFXPath;
-            if (ImGui.BeginCombo("##vfx", $"VFX: {currentPath}", ImGuiComboFlags.HeightLargest))
+            if(ImGui.BeginCombo("##vfx", $"VFX: {currentPath}", ImGuiComboFlags.HeightLargest))
             {
-                for (var i = 0; i < P.CommonProcessor.StatusEffectPaths.Count; i++)
+                for(var i = 0; i < P.CommonProcessor.StatusEffectPaths.Count; i++)
                 {
-                    if (ImGui.Selectable(P.CommonProcessor.StatusEffectPaths[i])) Selected.CustomFXPath = P.CommonProcessor.StatusEffectPaths[i];
+                    if(ImGui.Selectable(P.CommonProcessor.StatusEffectPaths[i])) Selected.CustomFXPath = P.CommonProcessor.StatusEffectPaths[i];
                 }
 
-                if (Selected.CustomFXPath == "Clear")
+                if(Selected.CustomFXPath == "Clear")
                 {
                     Selected.CustomFXPath = string.Empty;
                 }
 
                 ImGui.EndCombo();
             }
-            if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+            if(ImGui.IsItemClicked(ImGuiMouseButton.Right))
             {
                 Selected.CustomFXPath = string.Empty;
             }
@@ -156,18 +156,18 @@ public static class TabMoodles
             ImGuiEx.TextV($"Title:");
             Formatting();
             Utils.ParseBBSeString(Selected.Title, out var titleErr);
-            if (titleErr != null)
+            if(titleErr != null)
             {
                 ImGuiEx.HelpMarker(titleErr, EColor.RedBright, FontAwesomeIcon.ExclamationTriangle.ToIconString());
             }
-            if (Selected.Title.Length == 0)
+            if(Selected.Title.Length == 0)
             {
                 ImGuiEx.HelpMarker("Title can not be empty", EColor.RedBright, FontAwesomeIcon.ExclamationTriangle.ToIconString());
             }
             ImGui.TableNextColumn();
             ImGuiEx.SetNextItemFullWidth();
             ImGui.InputText("##name", ref Selected.Title, 150);
-            if (ImGui.IsItemDeactivatedAfterEdit())
+            if(ImGui.IsItemDeactivatedAfterEdit())
             {
                 P.IPCProcessor.StatusUpdated(Selected.GUID, false);
             }
@@ -179,14 +179,14 @@ public static class TabMoodles
             ImGuiEx.TextV($"Description:");
             Formatting();
             Utils.ParseBBSeString(Selected.Description, out var descErr);
-            if (descErr != null)
+            if(descErr != null)
             {
                 ImGuiEx.HelpMarker(descErr, EColor.RedBright, FontAwesomeIcon.ExclamationTriangle.ToIconString());
             }
             ImGui.TableNextColumn();
             ImGuiEx.SetNextItemFullWidth();
             ImGuiEx.InputTextMultilineExpanding("##desc", ref Selected.Description, 500);
-            if (ImGui.IsItemDeactivatedAfterEdit())
+            if(ImGui.IsItemDeactivatedAfterEdit())
             {
                 P.IPCProcessor.StatusUpdated(Selected.GUID, false);
             }
@@ -196,7 +196,7 @@ public static class TabMoodles
             ImGuiEx.TextV($"Category:");
             ImGui.TableNextColumn();
             ImGuiEx.SetNextItemFullWidth();
-            if (ImGuiEx.EnumRadio(ref Selected.Type, true))
+            if(ImGuiEx.EnumRadio(ref Selected.Type, true))
             {
                 P.IPCProcessor.StatusUpdated(Selected.GUID, false);
             }
@@ -205,12 +205,12 @@ public static class TabMoodles
             // Duration
             ImGui.TableNextColumn();
             ImGuiEx.TextV($"Duration:");
-            if (Selected.TotalDurationSeconds < 1 && !Selected.NoExpire)
+            if(Selected.TotalDurationSeconds < 1 && !Selected.NoExpire)
             {
                 ImGuiEx.HelpMarker("Duration must be at least 1 second", EColor.RedBright, FontAwesomeIcon.ExclamationTriangle.ToIconString());
             }
             ImGui.TableNextColumn();
-            if (Utils.DurationSelector("Permanent", ref Selected.NoExpire, ref Selected.Days, ref Selected.Hours, ref Selected.Minutes, ref Selected.Seconds))
+            if(Utils.DurationSelector("Permanent", ref Selected.NoExpire, ref Selected.Days, ref Selected.Hours, ref Selected.Minutes, ref Selected.Seconds))
             {
                 P.IPCProcessor.StatusUpdated(Selected.GUID, false);
             }
@@ -220,7 +220,7 @@ public static class TabMoodles
             ImGuiEx.TextV("Status Behavior:");
             ImGui.TableNextColumn();
             var persistTime = Selected.Modifiers.Has(Modifiers.PersistExpireTime);
-            if (ImGui.Checkbox("Persist Expire Time##noOverlapTime", ref persistTime))
+            if(ImGui.Checkbox("Persist Expire Time##noOverlapTime", ref persistTime))
             {
                 Selected.Modifiers.Set(Modifiers.PersistExpireTime, persistTime);
                 P.IPCProcessor.StatusUpdated(Selected.GUID, false);
@@ -228,7 +228,7 @@ public static class TabMoodles
             ImGuiEx.Tooltip("When enabled, any reapplication of this moodle keeps it's expire time.");
 
             ImGui.SameLine();
-            if (ImGui.Checkbox($"Sticky##sticky", ref Selected.AsPermanent))
+            if(ImGui.Checkbox($"Sticky##sticky", ref Selected.AsPermanent))
             {
                 P.IPCProcessor.StatusUpdated(Selected.GUID, false);
             }
@@ -242,12 +242,12 @@ public static class TabMoodles
     // Stacking based paramaters.
     private static void DrawStacking(int maxStacks)
     {
-        if (maxStacks <= 1)
+        if(maxStacks <= 1)
             return;
 
         ImGui.Spacing();
 
-        if (ImGui.BeginTable("##stacking", 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchSame))
+        if(ImGui.BeginTable("##stacking", 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchSame))
         {
             ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthFixed, 175f);
             ImGui.TableSetupColumn("Field", ImGuiTableColumnFlags.WidthStretch);
@@ -257,11 +257,11 @@ public static class TabMoodles
             ImGuiEx.HelpMarker("The number of stacks initially applied with the moodle.");
             ImGui.TableNextColumn();
             ImGuiEx.SetNextItemFullWidth();
-            if (ImGui.BeginCombo("##stk", StackText(Selected.Stacks)))
+            if(ImGui.BeginCombo("##stk", StackText(Selected.Stacks)))
             {
-                for (var i = 1; i <= maxStacks; i++)
+                for(var i = 1; i <= maxStacks; i++)
                 {
-                    if (ImGui.Selectable(StackText(i), Selected.Stacks == i))
+                    if(ImGui.Selectable(StackText(i), Selected.Stacks == i))
                     {
                         Selected.Stacks = i;
                         P.IPCProcessor.StatusUpdated(Selected.GUID, false);
@@ -277,11 +277,11 @@ public static class TabMoodles
             ImGuiEx.HelpMarker("If the same moodle is reapplied, the applied stacks increment by this many stacks.");
             ImGui.TableNextColumn();
             ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X / 2);
-            if (ImGui.BeginCombo("##incStk", StackText(Selected.StackSteps)))
+            if(ImGui.BeginCombo("##incStk", StackText(Selected.StackSteps)))
             {
-                for (var i = 0; i <= maxStacks; i++)
+                for(var i = 0; i <= maxStacks; i++)
                 {
-                    if (ImGui.Selectable(StackText(i), Selected.StackSteps == i))
+                    if(ImGui.Selectable(StackText(i), Selected.StackSteps == i))
                     {
                         Selected.StackSteps = i;
                         // Update modifiers.
@@ -293,14 +293,14 @@ public static class TabMoodles
             }
             ImGui.SameLine();
             var stacksRoll = Selected.Modifiers.Has(Modifiers.StacksRollOver);
-            if (ImGui.Checkbox("Roll Over Stacks##stkroll", ref stacksRoll))
+            if(ImGui.Checkbox("Roll Over Stacks##stkroll", ref stacksRoll))
             {
                 Selected.Modifiers.Set(Modifiers.StacksRollOver, stacksRoll);
                 P.IPCProcessor.StatusUpdated(Selected.GUID, false);
             }
             ImGuiEx.Tooltip("When a stack reaches its cap, it starts over and counts up again.");
 
-            if (Selected.ChainedStatus != Guid.Empty)
+            if(Selected.ChainedStatus != Guid.Empty)
             {
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
@@ -308,7 +308,7 @@ public static class TabMoodles
                 ImGuiEx.HelpMarker("How stacks from this moodle carry to the chained status.");
                 ImGui.TableNextColumn();
                 var moveStacks = Selected.Modifiers.Has(Modifiers.StacksMoveToChain);
-                if (ImGui.Checkbox("Transfer Stacks", ref moveStacks))
+                if(ImGui.Checkbox("Transfer Stacks", ref moveStacks))
                 {
                     Selected.Modifiers.Set(Modifiers.StacksMoveToChain, moveStacks);
                     P.IPCProcessor.StatusUpdated(Selected.GUID, false);
@@ -316,7 +316,7 @@ public static class TabMoodles
                 ImGui.SameLine();
                 var carryStacks = Selected.Modifiers.Has(Modifiers.StacksCarryToChain);
 
-                if (ImGui.Checkbox("Carry Over Stacks", ref carryStacks))
+                if(ImGui.Checkbox("Carry Over Stacks", ref carryStacks))
                 {
                     Selected.Modifiers.Set(Modifiers.StacksCarryToChain, carryStacks);
                     P.IPCProcessor.StatusUpdated(Selected.GUID, false);
@@ -325,7 +325,7 @@ public static class TabMoodles
 
                 ImGui.SameLine();
                 var persist = Selected.Modifiers.Has(Modifiers.PersistAfterTrigger);
-                if (ImGui.Checkbox("Persist", ref persist))
+                if(ImGui.Checkbox("Persist", ref persist))
                 {
                     Selected.Modifiers.Set(Modifiers.PersistAfterTrigger, persist);
                     P.IPCProcessor.StatusUpdated(Selected.GUID, false);
@@ -340,12 +340,12 @@ public static class TabMoodles
 
     private static void DrawDispelling()
     {
-        if (!P.CommonProcessor.DispelableIcons.Contains((uint)Selected.IconID))
+        if(!P.CommonProcessor.DispelableIcons.Contains((uint)Selected.IconID))
             return;
 
         ImGui.Spacing();
 
-        if (ImGui.BeginTable("##dispelling", 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchSame))
+        if(ImGui.BeginTable("##dispelling", 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchSame))
         {
             ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthFixed, 175f);
             ImGui.TableSetupColumn("Field", ImGuiTableColumnFlags.WidthStretch);
@@ -355,13 +355,13 @@ public static class TabMoodles
             ImGuiEx.HelpMarker("Makes the moodle dispelable. This is only visual unless 'Moodles can be Esunad' is enabled in settings.");
             ImGui.TableNextColumn();
             var canDispel = Selected.Modifiers.Has(Modifiers.CanDispel);
-            if (ImGui.Checkbox("##dispel", ref canDispel))
+            if(ImGui.Checkbox("##dispel", ref canDispel))
             {
                 Selected.Modifiers.Set(Modifiers.CanDispel, canDispel);
                 P.IPCProcessor.StatusUpdated(Selected.GUID, false);
             }
 
-            if (canDispel)
+            if(canDispel)
             {
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
@@ -370,7 +370,7 @@ public static class TabMoodles
                 ImGui.TableNextColumn();
                 ImGuiEx.SetNextItemFullWidth();
                 ImGui.InputTextWithHint("Dispeller##dispeller", "Player Name@World", ref Selected.Dispeller, 150, C.Censor ? ImGuiInputTextFlags.Password : ImGuiInputTextFlags.None);
-                if (ImGui.IsItemDeactivatedAfterEdit())
+                if(ImGui.IsItemDeactivatedAfterEdit())
                 {
                     P.IPCProcessor.StatusUpdated(Selected.GUID, false);
                 }
@@ -384,7 +384,7 @@ public static class TabMoodles
     {
         ImGui.Spacing();
 
-        if (ImGui.BeginTable("##chaining", 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchSame))
+        if(ImGui.BeginTable("##chaining", 2, ImGuiTableFlags.Borders | ImGuiTableFlags.RowBg | ImGuiTableFlags.SizingStretchSame))
         {
             ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthFixed, 175f);
             ImGui.TableSetupColumn("Field", ImGuiTableColumnFlags.WidthStretch);
@@ -394,43 +394,43 @@ public static class TabMoodles
             ImGui.TableNextColumn();
             ImGuiEx.SetNextItemFullWidth();
             string curChainPath = "Moodle to Chain... (Optional)";
-            if (C.SavedStatuses.Where(v => v.GUID == Selected.ChainedStatus).TryGetFirst(out MyStatus myStat))
+            if(C.SavedStatuses.Where(v => v.GUID == Selected.ChainedStatus).TryGetFirst(out MyStatus myStat))
             {
                 curChainPath = P.OtterGuiHandler.MoodleFileSystem.TryGetPathByID(myStat.GUID, out var path) ? path : myStat.GUID.ToString();
             }
 
-            if (ImGui.BeginCombo("##chainedStatus", curChainPath, ImGuiComboFlags.HeightLargest))
+            if(ImGui.BeginCombo("##chainedStatus", curChainPath, ImGuiComboFlags.HeightLargest))
             {
                 ImGuiEx.SetNextItemFullWidth();
                 ImGui.InputTextWithHint("##search", "Filter", ref Filter, 50);
 
-                if (ImGui.Selectable($"Clear", false, ImGuiSelectableFlags.None))
+                if(ImGui.Selectable($"Clear", false, ImGuiSelectableFlags.None))
                 {
                     Selected.ChainedStatus = Guid.Empty;
                     P.IPCProcessor.StatusUpdated(Selected.GUID, false);
                 }
 
-                foreach (var x in C.SavedStatuses)
+                foreach(var x in C.SavedStatuses)
                 {
-                    if (!x.IsValid(out _)) continue;
+                    if(!x.IsValid(out _)) continue;
 
-                    if (Selected.GUID != x.GUID && P.OtterGuiHandler.MoodleFileSystem.TryGetPathByID(x.GUID, out var path))
+                    if(Selected.GUID != x.GUID && P.OtterGuiHandler.MoodleFileSystem.TryGetPathByID(x.GUID, out var path))
                     {
-                        if (Filter == "" || path.Contains(Filter, StringComparison.OrdinalIgnoreCase))
+                        if(Filter == "" || path.Contains(Filter, StringComparison.OrdinalIgnoreCase))
                         {
                             var split = path.Split(@"/");
                             var name = split[^1];
                             var directory = split[0..^1].Join(@"/");
-                            if (directory != name)
+                            if(directory != name)
                             {
                                 ImGuiEx.RightFloat($"Selector{x.ID}", () => ImGuiEx.TextV(ImGuiColors.DalamudGrey, directory));
                             }
-                            if (ThreadLoadImageHandler.TryGetIconTextureWrap(x.AdjustedIconID, false, out var tex))
+                            if(ThreadLoadImageHandler.TryGetIconTextureWrap(x.AdjustedIconID, false, out var tex))
                             {
                                 ImGui.Image(tex.Handle, UI.StatusIconSize * 0.5f);
                                 ImGui.SameLine();
                             }
-                            if (ImGui.Selectable($"{name}##{x.ID}", false, ImGuiSelectableFlags.None))
+                            if(ImGui.Selectable($"{name}##{x.ID}", false, ImGuiSelectableFlags.None))
                             {
                                 Selected.ChainedStatus = x.GUID;
                                 P.IPCProcessor.StatusUpdated(Selected.GUID, false);
@@ -440,19 +440,19 @@ public static class TabMoodles
                 }
                 ImGui.EndCombo();
             }
-            if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+            if(ImGui.IsItemClicked(ImGuiMouseButton.Right))
             {
                 Selected.ChainedStatus = Guid.Empty;
                 P.IPCProcessor.StatusUpdated(Selected.GUID, false);
             }
 
-            if (Selected.ChainedStatus != Guid.Empty)
+            if(Selected.ChainedStatus != Guid.Empty)
             {
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn();
                 ImGuiEx.TextV("Chain Trigger:");
                 ImGui.TableNextColumn();
-                if (ImGuiEx.EnumRadio(ref Selected.ChainTrigger, true))
+                if(ImGuiEx.EnumRadio(ref Selected.ChainTrigger, true))
                 {
                     P.IPCProcessor.StatusUpdated(Selected.GUID, false);
                 }
@@ -473,7 +473,7 @@ public static class TabMoodles
         Selected.Modifiers = (Selected.StackSteps > 0) 
             ? Selected.Modifiers | Modifiers.StacksIncrease : Selected.Modifiers & ~Modifiers.StacksIncrease;
         // Clear dispeller if not dispellable.
-        if (!P.CommonProcessor.DispelableIcons.Contains((uint)Selected.IconID))
+        if(!P.CommonProcessor.DispelableIcons.Contains((uint)Selected.IconID))
         {
             Selected.Modifiers &= ~Modifiers.CanDispel;
             Selected.Dispeller = "";
@@ -482,7 +482,7 @@ public static class TabMoodles
 
     public static unsafe void ApplyToTarget(TargetApplyMode mode)
     {
-        if (!CharaWatcher.TryGetValue(Svc.Targets.Target?.Address ?? nint.Zero, out Character* chara))
+        if(!CharaWatcher.TryGetValue(Svc.Targets.Target?.Address ?? nint.Zero, out Character* chara))
             return;
 
         try

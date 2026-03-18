@@ -38,11 +38,11 @@ public unsafe class CommonProcessor : IDisposable
 
     public CommonProcessor()
     {
-        foreach (var x in Svc.Data.GetExcelSheet<Status>())
+        foreach(var x in Svc.Data.GetExcelSheet<Status>())
         {
-            if (IconStackCounts.TryGetValue(x.Icon, out var count))
+            if(IconStackCounts.TryGetValue(x.Icon, out var count))
             {
-                if (count < x.MaxStacks)
+                if(count < x.MaxStacks)
                 {
                     IconStackCounts[x.Icon] = x.MaxStacks;
                 }
@@ -53,25 +53,25 @@ public unsafe class CommonProcessor : IDisposable
             }
 
             var fxpath = x.HitEffect.ValueNullable?.Location.ValueNullable?.Location.ExtractText();
-            if (!fxpath.IsNullOrWhitespace() && !StatusEffectPaths.Contains(fxpath))
+            if(!fxpath.IsNullOrWhitespace() && !StatusEffectPaths.Contains(fxpath))
             {
                 StatusEffectPaths.Add(fxpath);
             }
 
-            if (NegativeStatuses.Contains(x.RowId) || PositiveStatuses.Contains(x.RowId) || SpecialStatuses.Contains(x.RowId)) continue;
-            if (x.CanIncreaseRewards == 1)
+            if(NegativeStatuses.Contains(x.RowId) || PositiveStatuses.Contains(x.RowId) || SpecialStatuses.Contains(x.RowId)) continue;
+            if(x.CanIncreaseRewards == 1)
             {
                 SpecialStatuses.Add(x.RowId);
             }
-            else if (x.StatusCategory == 1)
+            else if(x.StatusCategory == 1)
             {
                 PositiveStatuses.Add(x.RowId);
             }
-            else if (x.StatusCategory == 2)
+            else if(x.StatusCategory == 2)
             {
                 NegativeStatuses.Add(x.RowId);
                 DispelableIcons.Add(x.Icon);
-                for (var i = 1; i < x.MaxStacks; i++)
+                for(var i = 1; i < x.MaxStacks; i++)
                 {
                     DispelableIcons.Add((uint)(x.Icon + i));
                 }
@@ -128,28 +128,28 @@ public unsafe class CommonProcessor : IDisposable
         }
 
         // Iterate through all tracked status managers.
-        foreach (var (ownerNameWorld, sm) in C.StatusManagers)
+        foreach(var (ownerNameWorld, sm) in C.StatusManagers)
         {
             var removed = new List<MyStatus>();
             var doChainApply = new List<MyStatus>();
 
-            foreach (var x in sm.Statuses)
+            foreach(var x in sm.Statuses)
             {
-                if (x.ClickedOff && sm.LockedIds.Contains(x.GUID))
+                if(x.ClickedOff && sm.LockedIds.Contains(x.GUID))
                 {
                     x.ClickedOff = false;
                     continue;
                 }
 
                 // Deterministic Logic
-                if (x.ShouldExpireOnChain()) x.ExpiresAt = 0;
-                if (x.HadNaturalTimerFalloff() && x.ChainTrigger is ChainTrigger.TimerExpired) x.ApplyChain = true;
+                if(x.ShouldExpireOnChain()) x.ExpiresAt = 0;
+                if(x.HadNaturalTimerFalloff() && x.ChainTrigger is ChainTrigger.TimerExpired) x.ApplyChain = true;
 
                 // Get the expire time.
                 bool timeExpired = x.ExpiresAt - Utils.Time <= 0;
                                 
                 // Process status removal.
-                if (timeExpired || x.ClickedOff)
+                if(timeExpired || x.ClickedOff)
                 {
                     EnsureRemTextWasShown(sm, x, SHECandidates);
                     removed.Add(x);
@@ -159,7 +159,7 @@ public unsafe class CommonProcessor : IDisposable
                     EnsureAddTextWasShown(sm, x);
                 }
                 // Mark the status to apply the chain, then reset the flag.
-                if (x.ApplyChain)
+                if(x.ApplyChain)
                 {
                     doChainApply.Add(x);
                     x.ApplyChain = false;
@@ -180,20 +180,20 @@ public unsafe class CommonProcessor : IDisposable
             }
 
             // Handle any status chaining logic.
-            if (doChainApply.Count > 0)
+            if(doChainApply.Count > 0)
             {
-                foreach (var status in doChainApply) HandleStatusChaining(sm, status);
+                foreach(var status in doChainApply) HandleStatusChaining(sm, status);
             }
 
             // Handle any other SHECandidates processing removed and chain applications.
-            if (removed.Count > 0 || doChainApply.Count > 0) HandleSHECandidates();
+            if(removed.Count > 0 || doChainApply.Count > 0) HandleSHECandidates();
 
             // Handle event firing.
-            if (sm.NeedFireEvent)
+            if(sm.NeedFireEvent)
             {
                 sm.NeedFireEvent = false;
                 // If the status manager owner exists, we can mark them as modified.
-                if (sm.Owner != null)
+                if(sm.Owner != null)
                 {
                     try
                     {
@@ -214,13 +214,13 @@ public unsafe class CommonProcessor : IDisposable
         // Helper function to process the SHECandidates.
         void HandleSHECandidates()
         {
-            foreach (var x in SHECandidates)
+            foreach(var x in SHECandidates)
             {
                 Character* chara = (Character*)x.PlayerAddr;
-                if (ShouldSpawnHitEffect(chara, x.customPath))
+                if(ShouldSpawnHitEffect(chara, x.customPath))
                 {
                     PluginLog.Debug($"StatusHitEffect on: {chara->NameString} / {x.customPath}");
-                    if (x.customPath == "kill")
+                    if(x.customPath == "kill")
                     {
                         P.Memory.SpawnSHE("dk04ht_canc0h", x.PlayerAddr, x.PlayerAddr, -1, char.MinValue, 0, char.MinValue);
                     }
@@ -240,35 +240,35 @@ public unsafe class CommonProcessor : IDisposable
         void HandleStatusChaining(MyStatusManager manager, MyStatus cur)
         {
             // Search for the chained status.
-            foreach (var s in C.SavedStatuses)
+            foreach(var s in C.SavedStatuses)
             {
-                if (s.GUID != cur.ChainedStatus) continue;
+                if(s.GUID != cur.ChainedStatus) continue;
 
                 int oldMax = P.CommonProcessor.IconStackCounts.TryGetValue((uint)cur.IconID, out var oCount) ? (int)oCount : 1;
 
                 // Aquire the new chained status to be applied.
                 MyStatus? newStatus = manager.AddOrUpdate(s.PrepareToApply(s.Persistent ? PrepareOptions.Persistent : PrepareOptions.NoOption), UpdateSource.StatusTuple);
                 // If the new status if not valid just fail this process.
-                if (newStatus is null) return;
+                if(newStatus is null) return;
 
                 // Get the new max stacks, and if stackable, transfer stack logic.
                 int newMaxStacks = P.CommonProcessor.IconStackCounts.TryGetValue((uint)newStatus.IconID, out var nCount) ? (int)nCount : 1;
-                if (newMaxStacks > 1)
+                if(newMaxStacks > 1)
                 {
-                    if (cur.Modifiers.Has(Modifiers.StacksCarryToChain))
+                    if(cur.Modifiers.Has(Modifiers.StacksCarryToChain))
                     {
                         // Use (oldMax - 1) here because our stacks always start at 1, not 0. So if it has 8 stacks, it can only increment 7 times.
                         var toCarryOver = (cur.Stacks + cur.StackSteps) - (oldMax - 1);
                         newStatus.Stacks = Math.Min(newStatus.Stacks - newStatus.StackSteps + toCarryOver, newMaxStacks);
                     }
-                    else if (cur.Modifiers.Has(Modifiers.StacksMoveToChain))
+                    else if(cur.Modifiers.Has(Modifiers.StacksMoveToChain))
                     {
                         newStatus.Stacks = Math.Min(oldMax, newMaxStacks);
                     }
                 }
 
                 // Fix ensuring cap is hit when the chain trigger is max stacks.
-                if (cur.ChainTrigger is ChainTrigger.HitMaxStacks)
+                if(cur.ChainTrigger is ChainTrigger.HitMaxStacks)
                 {
                     cur.Stacks = cur.Modifiers.Has(Modifiers.StacksRollOver) ? Math.Clamp((cur.Stacks + cur.StackSteps) - oldMax, 1, oldMax) : oldMax;
                     manager.AddTextShown.Remove(cur.GUID);
@@ -283,21 +283,21 @@ public unsafe class CommonProcessor : IDisposable
 
         void EnsureAddTextWasShown(MyStatusManager manager, MyStatus status)
         {
-            if (manager.AddTextShown.Contains(status.GUID))
+            if(manager.AddTextShown.Contains(status.GUID))
                 return;
 
-            if (P.CanModifyUI() && manager.OwnerValid)
+            if(P.CanModifyUI() && manager.OwnerValid)
             {
-                if (manager.Owner->CanSpawnFlyText())
+                if(manager.Owner->CanSpawnFlyText())
                 {
                     FlyPopupTextProcessor.Enqueue(new(status, true, manager.Owner->EntityId));
                 }
-                if (manager.Owner->CanSpawnVFX())
+                if(manager.Owner->CanSpawnVFX())
                 {
-                    if (!SHECandidates.Any(s => s.PlayerAddr == (nint)manager.Owner))
+                    if(!SHECandidates.Any(s => s.PlayerAddr == (nint)manager.Owner))
                     {
                         // PluginLog.Debug($"Adding text for someone");
-                        if (status.CustomFXPath.IsNullOrWhitespace())
+                        if(status.CustomFXPath.IsNullOrWhitespace())
                         {
                             SHECandidates.Add(((nint)manager.Owner, Utils.FindVFXPathByIconID((uint)status.IconID)));
                         }
@@ -313,17 +313,17 @@ public unsafe class CommonProcessor : IDisposable
 
         void EnsureRemTextWasShown(MyStatusManager manager, MyStatus status, List<(nint PlayerAddr, string customPath)> SHECandidates)
         {
-            if (manager.RemTextShown.Contains(status.GUID))
+            if(manager.RemTextShown.Contains(status.GUID))
                 return;
-            if (P.CanModifyUI() && manager.Owner != null)
+            if(P.CanModifyUI() && manager.Owner != null)
             {
-                if (manager.Owner->CanSpawnFlyText())
+                if(manager.Owner->CanSpawnFlyText())
                 {
                     FlyPopupTextProcessor.Enqueue(new(status, false, manager.Owner->EntityId));
                 }
-                if (manager.Owner->CanSpawnVFX())
+                if(manager.Owner->CanSpawnVFX())
                 {
-                    if (!SHECandidates.Any(s => s.PlayerAddr == (nint)manager.Owner))
+                    if(!SHECandidates.Any(s => s.PlayerAddr == (nint)manager.Owner))
                     {
                         SHECandidates.Add(((nint)manager.Owner, "kill"));
                     }
@@ -336,17 +336,17 @@ public unsafe class CommonProcessor : IDisposable
     private static unsafe bool ShouldSpawnHitEffect(Character* chara, string vfxPath)
     {
         // For some really weird reason whenever this is included the plugin just randomly decides if it wants to spawn any SHE at all.
-        // if (!C.EnableSHE) return false;
+        // if(!C.EnableSHE) return false;
 
-        if (!C.RestrictSHE) return true;
+        if(!C.RestrictSHE) return true;
 
-        if ((nint)chara == LocalPlayer.Address) return true;
+        if((nint)chara == LocalPlayer.Address) return true;
 
-        if (Utils.GetFriendlist().Contains(chara->GetNameWithWorld())) return true;
+        if(Utils.GetFriendlist().Contains(chara->GetNameWithWorld())) return true;
 
-        if (UniversalParty.Members.Any(z => z.NameWithWorld == chara->GetNameWithWorld())) return true;
+        if(UniversalParty.Members.Any(z => z.NameWithWorld == chara->GetNameWithWorld())) return true;
 
-        if (Vector3.Distance(LocalPlayer.Character->Position, chara->Position) < 15f) return true;
+        if(Vector3.Distance(LocalPlayer.Character->Position, chara->Position) < 15f) return true;
 
         return false;
     }
@@ -354,7 +354,7 @@ public unsafe class CommonProcessor : IDisposable
     // Update to include the status manager parent.
     public void SetIcon(AtkUnitBase* addon, AtkResNode* container, MyStatus status)
     {
-        if (!container->IsVisible())
+        if(!container->IsVisible())
         {
             container->NodeFlags ^= NodeFlags.Visible;
         }
@@ -364,33 +364,33 @@ public unsafe class CommonProcessor : IDisposable
         var dispelNode = container->GetAsAtkComponentNode()->Component->UldManager.NodeList[0];
 
         // Make it not marked as dispelable if it is not part of the dispelable icons cache.
-        if (status.Modifiers.Has(Modifiers.CanDispel) && !DispelableIcons.Contains((uint)status.IconID))
+        if(status.Modifiers.Has(Modifiers.CanDispel) && !DispelableIcons.Contains((uint)status.IconID))
         {
             status.Modifiers.Set(Modifiers.CanDispel, false);
         }
 
         // Toggle visibility if it does not match the dispel nodes visibility
-        if (status.Modifiers.Has(Modifiers.CanDispel) != dispelNode->IsVisible())
+        if(status.Modifiers.Has(Modifiers.CanDispel) != dispelNode->IsVisible())
         {
             dispelNode->NodeFlags ^= NodeFlags.Visible;
         }
 
         var textNode = container->GetAsAtkComponentNode()->Component->UldManager.NodeList[2];
         var timerText = "";
-        if (status.ExpiresAt != long.MaxValue)
+        if(status.ExpiresAt != long.MaxValue)
         {
             var rem = status.ExpiresAt - Utils.Time;
             timerText = rem > 0 ? GetTimerText(rem) : "";
         }
 
-        if (timerText != null)
+        if(timerText != null)
         {
-            if (!textNode->IsVisible()) textNode->NodeFlags ^= NodeFlags.Visible;
+            if(!textNode->IsVisible()) textNode->NodeFlags ^= NodeFlags.Visible;
         }
 
         var t = textNode->GetAsAtkTextNode();
         t->SetText((timerText ?? SeString.Empty).Encode());
-        if (status.Applier == LocalPlayer.NameWithWorld)
+        if(status.Applier == LocalPlayer.NameWithWorld)
         {
             t->TextColor = CreateColor(0xc9ffe4ff);
             t->EdgeColor = CreateColor(0x0a5f24ff);
@@ -404,25 +404,25 @@ public unsafe class CommonProcessor : IDisposable
         }
         var addr = (nint)(container->GetAsAtkComponentNode()->Component);
         // PluginLog.Debug($"- = - {MemoryHelper.ReadStringNullTerminated((nint)addon->Name)} - = -");
-        if (HoveringOver == addr && status.TooltipShown == -1)
+        if(HoveringOver == addr && status.TooltipShown == -1)
         {
             //PluginLog.Debug($"Trigger 0:{addr:X16} / {Utils.Frame} / {GetCallStackID()}");
             C.StatusManagers.Each(f => f.Value.Statuses.Each(z => z.TooltipShown = -1));
             status.TooltipShown = addon->Id;
             AtkStage.Instance()->TooltipManager.HideTooltip(addon->Id);
             var str = status.Title;
-            if (status.Description != "")
+            if(status.Description != "")
             {
                 str += $"\n{status.Description}";
             }
             MemoryHelper.WriteSeString(TooltipMemory, Utils.ParseBBSeString(str));
             AtkStage.Instance()->TooltipManager.ShowTooltip((ushort)addon->Id, container, (byte*)TooltipMemory);
         }
-        if (status.TooltipShown == addon->Id && HoveringOver != addr)
+        if(status.TooltipShown == addon->Id && HoveringOver != addr)
         {
             //PluginLog.Debug($"Trigger 1 {addr:X16} / {Utils.Frame} / {GetCallStackID()}");
             status.TooltipShown = -1;
-            if (HoveringOver == 0)
+            if(HoveringOver == 0)
             {
                 //PluginLog.Debug($"Trigger 2 / {Utils.Frame} / {GetCallStackID()}");
                 AtkStage.Instance()->TooltipManager.HideTooltip(addon->Id);
@@ -430,24 +430,24 @@ public unsafe class CommonProcessor : IDisposable
         }
 
         // If we requested to cancel this via a right click, then flag it for this.
-        if (CancelRequests.Remove(addr))
+        if(CancelRequests.Remove(addr))
         {
             // Move hiding the mouseover to here so we can reference the status that is removed.
             var name = addon->NameString;
-            if (name.StartsWith("_StatusCustom") || name == "_Status") status.ClickedOff = true;
+            if(name.StartsWith("_StatusCustom") || name == "_Status") status.ClickedOff = true;
         }
     }
 
     public string GetTimerText(long rem)
     {
         var seconds = MathF.Ceiling((float)rem / 1000f);
-        if (seconds <= 59) return seconds.ToString();
+        if(seconds <= 59) return seconds.ToString();
         var minutes = MathF.Floor((float)seconds / 60f);
-        if (minutes <= 59) return $"{minutes}m";
+        if(minutes <= 59) return $"{minutes}m";
         var hours = MathF.Floor((float)minutes / 60f);
-        if (hours <= 59) return $"{hours}h";
+        if(hours <= 59) return $"{hours}h";
         var days = MathF.Floor((float)hours / 24f);
-        if (days <= 9) return $"{days}d";
+        if(days <= 9) return $"{days}d";
         return $">9d";
     }
 

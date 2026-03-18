@@ -45,7 +45,7 @@ public sealed unsafe class FlyPopupTextProcessor : IDisposable
 
         var objManager = GameObjectManager.Instance();
 
-        if (Queue.Count > C.FlyPopupTextLimit)
+        if(Queue.Count > C.FlyPopupTextLimit)
         {
             PluginLog.Warning($"FlyPopupTextProcessor Queue is too large! Trimming to {C.FlyPopupTextLimit} closest entities.");
             var n = Queue.RemoveAll(x =>
@@ -54,7 +54,7 @@ public sealed unsafe class FlyPopupTextProcessor : IDisposable
                 return obj == null || !obj->IsCharacter();
             });
 
-            if (n > 0) PluginLog.Information($"  Removed {n} non-player entities");
+            if(n > 0) PluginLog.Information($"  Removed {n} non-player entities");
 
             Queue = Queue
                 .OrderBy(x => Vector3.DistanceSquared(LocalPlayer.Character->Position, objManager->Objects.GetObjectByEntityId(x.OwnerEntityId)->Position))
@@ -68,9 +68,9 @@ public sealed unsafe class FlyPopupTextProcessor : IDisposable
             for(var i = 0; i < 200; i++)
             {
                 GameObject* obj = objManager->Objects.IndexSorted[i];
-                if (obj == null) continue;
-                if (obj->EntityId != e.OwnerEntityId) continue;
-                if (!obj->IsCharacter()) continue;
+                if(obj == null) continue;
+                if(obj->EntityId != e.OwnerEntityId) continue;
+                if(!obj->IsCharacter()) continue;
 
                 target = (Character*)obj;
                 break; // Break out of loop once found.

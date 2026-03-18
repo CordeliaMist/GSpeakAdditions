@@ -52,7 +52,7 @@ public class IPCProcessor : IDisposable
     [EzIPC("ClearStatusManagerByNameV2")]
     private unsafe void ClearStatusManager(string name)
     {
-        if (CharaWatcher.TryGetFirst(x => x.GetNameWithWorld() == name || x.NameString == name, out var chara))
+        if(CharaWatcher.TryGetFirst(x => x.GetNameWithWorld() == name || x.NameString == name, out var chara))
         {
             ClearStatusManagerInternal(chara);
         }
@@ -61,7 +61,7 @@ public class IPCProcessor : IDisposable
     [EzIPC("ClearStatusManagerByPtrV2")]
     private void ClearStatusManager(nint ptr)
     {
-        if (!CharaWatcher.Rendered.Contains(ptr)) return;
+        if(!CharaWatcher.Rendered.Contains(ptr)) return;
         ClearStatusManagerInternal(ptr);
     }
 
@@ -74,16 +74,16 @@ public class IPCProcessor : IDisposable
     private unsafe void ClearStatusManagerInternal(nint charaAddr)
     {
         Character* chara = (Character*)charaAddr;
-        if (chara == null)
+        if(chara == null)
         {
             PluginLog.LogWarning("[IPC] Clear Status Manager Chara is NULL");
             return;
         }
 
         var mySM = chara->MyStatusManager();
-        foreach (var s in mySM.Statuses)
+        foreach(var s in mySM.Statuses)
         {
-            if (!s.Persistent)
+            if(!s.Persistent)
             {
                 mySM.Cancel(s);
             }
@@ -94,7 +94,7 @@ public class IPCProcessor : IDisposable
     [EzIPC("SetStatusManagerByNameV2")]
     private void SetStatusManager(string name, string data)
     {
-        if (CharaWatcher.TryGetFirst(x => x.GetNameWithWorld() == name || x.NameString == name, out var chara))
+        if(CharaWatcher.TryGetFirst(x => x.GetNameWithWorld() == name || x.NameString == name, out var chara))
         {
             SetStatusManagerInternal(chara, data);
         }
@@ -103,7 +103,7 @@ public class IPCProcessor : IDisposable
     [EzIPC("SetStatusManagerByPtrV2")]
     private void SetStatusManager(nint ptr, string data)
     {
-        if (!CharaWatcher.Rendered.Contains(ptr)) return;
+        if(!CharaWatcher.Rendered.Contains(ptr)) return;
         SetStatusManagerInternal(ptr, data);
     }
 
@@ -116,7 +116,7 @@ public class IPCProcessor : IDisposable
     private unsafe void SetStatusManagerInternal(nint charaAddr, string data)
     {
         Character* chara = (Character*)charaAddr;
-        if (chara == null)
+        if(chara == null)
         {
             PluginLog.LogWarning("[IPC] Set Status Manager Chara is NULL");
             return;
@@ -147,7 +147,7 @@ public class IPCProcessor : IDisposable
     private unsafe string GetStatusManagerInternal(nint charaAddr)
     {
         Character* chara = (Character*)charaAddr;
-        if (chara == null)
+        if(chara == null)
         {
             PluginLog.LogWarning("[IPC] Get Status Manager Chara is NULL");
             return null!;
@@ -180,7 +180,7 @@ public class IPCProcessor : IDisposable
     private unsafe List<MoodlesStatusInfo> GetStatusManagerInfoInternal(nint charaAddr)
     {
         Character* chara = (Character*)charaAddr;
-        if (chara == null)
+        if(chara == null)
         {
             PluginLog.LogWarning("[IPC] Get Status Manager Info Chara is NULL");
             return new List<MoodlesStatusInfo>();
@@ -225,9 +225,9 @@ public class IPCProcessor : IDisposable
     private List<MoodlesMoodleInfo> GetRegisteredMoodlesV2()
     {
         var ret = new List<MoodlesMoodleInfo>();
-        foreach (var x in C.SavedStatuses)
+        foreach(var x in C.SavedStatuses)
         {
-            if (P.OtterGuiHandler.MoodleFileSystem.FindLeaf(x, out var path))
+            if(P.OtterGuiHandler.MoodleFileSystem.FindLeaf(x, out var path))
                 ret.Add((x.GUID, (uint)x.IconID, path.FullName(), x.Title));
         }
         return ret;
@@ -240,9 +240,9 @@ public class IPCProcessor : IDisposable
     private List<MoodlesProfileInfo> GetRegisteredProfilesV2()
     {
         var ret = new List<MoodlesProfileInfo>();
-        foreach (var x in C.SavedPresets)
+        foreach(var x in C.SavedPresets)
         {
-            if (P.OtterGuiHandler.PresetFileSystem.FindLeaf(x, out var path))
+            if(P.OtterGuiHandler.PresetFileSystem.FindLeaf(x, out var path))
             {
                 ret.Add((x.GUID, path.FullName()));
             }
@@ -256,7 +256,7 @@ public class IPCProcessor : IDisposable
     [EzIPC]
     private void AddOrUpdateStatusByNameV2(Guid guid, string name)
     {
-        if (CharaWatcher.TryGetFirst(x => x.GetNameWithWorld() == name || x.NameString == name, out var chara))
+        if(CharaWatcher.TryGetFirst(x => x.GetNameWithWorld() == name || x.NameString == name, out var chara))
         {
             AddOrUpdateMoodleInternal(chara, guid);
         }
@@ -265,7 +265,7 @@ public class IPCProcessor : IDisposable
     [EzIPC]
     private void AddOrUpdateMoodleByPtrV2(Guid guid, nint ptr)
     {
-        if (!CharaWatcher.Rendered.Contains(ptr)) return;
+        if(!CharaWatcher.Rendered.Contains(ptr)) return;
         AddOrUpdateMoodleInternal(ptr, guid);
     }
 
@@ -278,15 +278,15 @@ public class IPCProcessor : IDisposable
     private unsafe void AddOrUpdateMoodleInternal(nint charaAddr, Guid guid)
     {
         Character* chara = (Character*)charaAddr;
-        if (chara == null)
+        if(chara == null)
         {
             PluginLog.LogWarning("[IPC] AddOrUpdate Moodle Chara is NULL");
             return;
         }
-        if (C.SavedStatuses.TryGetFirst(x => x.GUID == guid, out var status))
+        if(C.SavedStatuses.TryGetFirst(x => x.GUID == guid, out var status))
         {
             var sm = chara->MyStatusManager();
-            if (!sm.Ephemeral)
+            if(!sm.Ephemeral)
             {
                 PluginLog.LogDebug($"Adding or Updating Moodle {status.Title} to {chara->GetNameWithWorld()}");
                 sm.AddOrUpdate(status.PrepareToApply(), UpdateSource.StatusTuple, false, true);
@@ -297,7 +297,7 @@ public class IPCProcessor : IDisposable
     [EzIPC]
     private void ApplyPresetByNameV2(Guid guid, string name)
     {
-        if (CharaWatcher.TryGetFirst(x => x.GetNameWithWorld() == name || x.NameString == name, out var chara))
+        if(CharaWatcher.TryGetFirst(x => x.GetNameWithWorld() == name || x.NameString == name, out var chara))
         {
             ApplyPresetInternal(chara, guid);
         }
@@ -306,7 +306,7 @@ public class IPCProcessor : IDisposable
     [EzIPC]
     private void ApplyPresetByPtrV2(Guid guid, nint ptr)
     {
-        if (!CharaWatcher.Rendered.Contains(ptr)) return;
+        if(!CharaWatcher.Rendered.Contains(ptr)) return;
         ApplyPresetInternal(ptr, guid);
     }
     [EzIPC]
@@ -318,15 +318,15 @@ public class IPCProcessor : IDisposable
     private unsafe void ApplyPresetInternal(nint charaAddr, Guid guid)
     {
         Character* chara = (Character*)charaAddr;
-        if (chara == null)
+        if(chara == null)
         {
             PluginLog.LogWarning("[IPC] Apply Preset Chara is NULL");
             return;
         }
-        if (C.SavedPresets.TryGetFirst(x => x.GUID == guid, out var preset))
+        if(C.SavedPresets.TryGetFirst(x => x.GUID == guid, out var preset))
         {
             var sm = chara->MyStatusManager();
-            if (!sm.Ephemeral)
+            if(!sm.Ephemeral)
             {
                 sm.ApplyPreset(preset);
             }
@@ -344,11 +344,11 @@ public class IPCProcessor : IDisposable
         Character* chara = (Character*)charaAddr;
         var sm = chara->MyStatusManager();
 
-        if (sm.Statuses.TryGetFirst(x => x.GUID == guid, out var status))
+        if(sm.Statuses.TryGetFirst(x => x.GUID == guid, out var status))
         {
-            if (!sm.Ephemeral)
+            if(!sm.Ephemeral)
             {
-                if (!status.Persistent)
+                if(!status.Persistent)
                 {
                     sm.Cancel(guid);
                 }
@@ -360,7 +360,7 @@ public class IPCProcessor : IDisposable
     [EzIPC]
     private void RemoveMoodlesByNameV2(List<Guid> guids, string name)
     {
-        if (CharaWatcher.TryGetFirst(x => x.GetNameWithWorld() == name || x.NameString == name, out var chara))
+        if(CharaWatcher.TryGetFirst(x => x.GetNameWithWorld() == name || x.NameString == name, out var chara))
         {
             RemoveMoodlesInternal(chara, guids);
             return;
@@ -370,7 +370,7 @@ public class IPCProcessor : IDisposable
     [EzIPC]
     private void RemoveMoodlesByPtrV2(List<Guid> guids, nint ptr)
     { 
-        if (!CharaWatcher.Rendered.Contains(ptr)) return;
+        if(!CharaWatcher.Rendered.Contains(ptr)) return;
         RemoveMoodlesInternal(ptr, guids);
     }
 
@@ -383,19 +383,19 @@ public class IPCProcessor : IDisposable
     private unsafe void RemoveMoodlesInternal(nint charaAddr, List<Guid> guids)
     {
         Character* chara = (Character*)charaAddr;
-        if (chara == null)
+        if(chara == null)
         {
             PluginLog.LogWarning("[IPC] Remove Moodles Chara is NULL");
             return;
         }
         var sm = chara->MyStatusManager();
-        foreach (var guid in guids)
+        foreach(var guid in guids)
         {
-            if (sm.Statuses.TryGetFirst(x => x.GUID == guid, out var status))
+            if(sm.Statuses.TryGetFirst(x => x.GUID == guid, out var status))
             {
-                if (!sm.Ephemeral)
+                if(!sm.Ephemeral)
                 {
-                    if (!status.Persistent)
+                    if(!status.Persistent)
                     {
                         sm.Cancel(guid);
                     }
@@ -410,20 +410,20 @@ public class IPCProcessor : IDisposable
     private unsafe void RemovePresetInternal(nint charaAddr, Guid guid)
     {
         Character* chara = (Character*)charaAddr;
-        if (chara == null)
+        if(chara == null)
         {
             PluginLog.LogWarning("[IPC] Remove Preset Chara is NULL");
             return;
         }
         // preset must exist in our saved presets since presets are not stored in the Status Manager
-        if (C.SavedPresets.TryGetFirst(x => x.GUID == guid, out var preset))
+        if(C.SavedPresets.TryGetFirst(x => x.GUID == guid, out var preset))
         {
             var sm = chara->MyStatusManager();
             if(!sm.Ephemeral)
             {
-                foreach (var ps in preset.Statuses)
+                foreach(var ps in preset.Statuses)
                 {
-                     if (sm.Statuses.FirstOrDefault(x => x.GUID == ps) is { } status && !status.Persistent)
+                     if(sm.Statuses.FirstOrDefault(x => x.GUID == ps) is { } status && !status.Persistent)
                      {
                          sm.Cancel(ps);
                      }

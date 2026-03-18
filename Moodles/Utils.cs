@@ -15,7 +15,7 @@ public static unsafe partial class Utils
 {
     public static TargetApplyMode GetApplyMode()
     {
-        if (Svc.Targets.Target is not IPlayerCharacter pc)
+        if(Svc.Targets.Target is not IPlayerCharacter pc)
             return TargetApplyMode.NoTarget;
         return TargetApplyMode.Local;
     }
@@ -80,10 +80,10 @@ public static unsafe partial class Utils
 
     public static bool IsNotNull(this MyStatus? status)
     {
-        if (status == null) return false;
-        if (status.Applier == null) return false;
-        if (status.Description == null) return false;
-        if (status.Title == null) return false;
+        if(status == null) return false;
+        if(status.Applier == null) return false;
+        if(status.Description == null) return false;
+        if(status.Title == null) return false;
         return true;
     }
 
@@ -133,15 +133,15 @@ public static unsafe partial class Utils
 
     public static MyStatusManager GetMyStatusManager(string playerName, bool create = true)
     {
-        if (!C.StatusManagers.TryGetValue(playerName, out var manager))
+        if(!C.StatusManagers.TryGetValue(playerName, out var manager))
         {
-            if (create)
+            if(create)
             {
                 PluginLog.Verbose($"Creating new status manager for {playerName}");
                 manager = new();
                 C.StatusManagers[playerName] = manager;
                 // Set the owner if so.
-                if (CharaWatcher.TryGetFirst(x => x.GetNameWithWorld() == playerName, out var chara))
+                if(CharaWatcher.TryGetFirst(x => x.GetNameWithWorld() == playerName, out var chara))
                 {
                     manager.Owner = (Character*)chara;
                 }
@@ -250,10 +250,10 @@ public static unsafe partial class Utils
 
     public static string FindVFXPathByIconID(uint iconID)
     {
-        foreach (var x in Svc.Data.GetExcelSheet<Status>())
+        foreach(var x in Svc.Data.GetExcelSheet<Status>())
         {
-            if (x.Icon == iconID) return x.HitEffect.ValueNullable?.Location.ValueNullable?.Location.ExtractText() ?? string.Empty;
-            if (x.MaxStacks > 1 && iconID >= x.Icon + 1 && iconID < x.Icon + x.MaxStacks) return x.HitEffect.ValueNullable?.Location.ValueNullable?.Location.ExtractText() ?? string.Empty;
+            if(x.Icon == iconID) return x.HitEffect.ValueNullable?.Location.ValueNullable?.Location.ExtractText() ?? string.Empty;
+            if(x.MaxStacks > 1 && iconID >= x.Icon + 1 && iconID < x.Icon + x.MaxStacks) return x.HitEffect.ValueNullable?.Location.ValueNullable?.Location.ExtractText() ?? string.Empty;
         }
         return string.Empty;
     }
