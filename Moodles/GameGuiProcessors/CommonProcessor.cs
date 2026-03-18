@@ -32,6 +32,8 @@ public unsafe class CommonProcessor : IDisposable
     public List<nint> CancelRequests = [];
     public bool WasRightMousePressed = false;
     public bool NewMethod = true;
+    public int RemovedThisTick = 0;
+
     private nint TooltipMemory;
 
     public CommonProcessor()
@@ -117,11 +119,12 @@ public unsafe class CommonProcessor : IDisposable
     {
         // List of VFX that should be handled by the StatusHitEffect.
         List<(nint PlayerAddr, string customPath)> SHECandidates = [];
+        RemovedThisTick = 0;
 
-        if (HoveringOver != 0)
+        if(HoveringOver != 0)
         {
-            if (IsKeyPressed(LimitedKeys.LeftMouseButton)) WasRightMousePressed = false;
-            if (IsKeyPressed(LimitedKeys.RightMouseButton)) WasRightMousePressed = true;
+            if(IsKeyPressed(LimitedKeys.LeftMouseButton)) WasRightMousePressed = false;
+            if(IsKeyPressed(LimitedKeys.RightMouseButton)) WasRightMousePressed = true;
         }
 
         // Iterate through all tracked status managers.
@@ -167,9 +170,13 @@ public unsafe class CommonProcessor : IDisposable
 
             // Now process the removal of all statuses marked.
             // (This allows for chains to be applied without removing original if desired)
-            if (removed.Count > 0)
+            if(removed.Count > 0)
             {
-                foreach (var status in removed) sm.Remove(status);
+                foreach(var status in removed)
+                {
+                    sm.Remove(status);
+                    RemovedThisTick++;
+                }
             }
 
             // Handle any status chaining logic.
